@@ -1,0 +1,375 @@
+    1. Update all package system
+       sudo xbps-install -Suv 
+
+    2. add non-free repo
+       sudo xbps-install -Rs void-repo-nonfree 
+
+    3. Software & utilities
+       sudo xbps-install -Rs xdg-desktop-portal xdg-desktop-portal-gtk xdg-user-dirs xdg-user-dirs-gtk xdg-utils vlc pipewire libspa-bluetooth noto-fonts-cjk noto-fonts-emoji noto-fonts-ttf noto-fonts-ttf-extra libreoffice-writer libreoffice-calc libreoffice-impress rhythmbox neofetch ntfs-3g gimp inkscape lm_sensors wget udisks2 gvfs mtpfs gvfs-mtp gvfs-gphoto2 xtools WoeUSB xz unrar qt5-wayland nano ffmpeg Kooha handbrake inxi streamlink
+       
+    4. Install chrome gnome, gnome menu For Gnome & extension
+       sudo xbps-install -Rs chrome-gnome-shell gnome-menus
+       install extension shell gnome for chrome
+       https://chrome.google.com/webstore/detail/gnome-shell-integration/gphhapmejobijbbhgpjhcjognlahblep?hl=id
+       install extension shell gnome for firefox 
+       https://addons.mozilla.org/id/firefox/addon/gnome-shell-integration/
+       install gnome extension clipboard indicator
+       https://extensions.gnome.org/extension/779/clipboard-indicator/
+       install gnome extension section todo
+       https://extensions.gnome.org/extension/1104/section-todo-list/
+       
+       (NOTE : if you want to install and activate dash to dock in gnome 4.x you can do this :)
+       git clone https://github.com/ewlsh/dash-to-dock.git
+       cd dash-to-dock
+       git checkout ewlsh/gnome-40
+       make
+       make install
+       (Note: if you get error, you can solved with install nvm + nodejs like in this doc, 
+       then install gettext : sudo xbps-install -Rs gettext, then run make again and make install)
+       dont forget to logout your session and login again, then open your extension and activate it.
+        
+    5. Install Video acceleration for Mesa Driver
+       sudo xbps-install -Rs mesa-vdpau mesa-vaapi
+       
+    6. install Programming Software
+       sudo xbps-install -Rs git composer vscode zsh dbeaver 
+       
+    7. install Printer && Scanner
+       sudo xbps-install -Rs cups cups-filters gutenprint
+       add service
+       sudo ln -s /etc/sv/cupsd /var/service/
+       
+       Epson Printer:
+       sudo xbps-install -Rs epson-inkjet-printer-escpr imagescan iscan-data
+       
+       HP Printer :
+       sudo xbps-install -Rs hplip-gui
+       
+       Canon Printer :
+       sudo xbps-install -Rs cnijfilter2
+       
+       Brother Printer :
+       sudo xbps-install -Rs brother-brlaser
+       
+       NOTE : 
+       sudo xbps-install brother-brscan3	SANE scanner driver for brscan3-compatible Brother scanners
+       sudo xbps-install brother-brscan4	SANE scanner driver for brscan4-compatible printers
+       sudo xbps-install brother-dcp197c-cupswrapper	CUPS wrapper driver for the brother DCP-197C printer/scanner
+       sudo xbps-install brother-dcp197c-lpr	LPR driver for the brother DCP-197C printer/scanner
+       
+       Open Printing :
+       sudo xbps-install foomatic-db-nonfree
+       
+       
+    8. Install Zsh and set as default shell with powerlevel10k :
+       sudo xbps-install -Rs zsh git
+       Download ohmyzsh
+       sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+       set default zsh
+       sudo chsh -s /bin/zsh
+       you must logout your session then login again
+       download powerlevel10k
+       git clone --depth=1 https://github.com/romkatv/powerlevel10k.git ${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k
+       edit your ~/.zshrc
+       sudo nano ~/.zshrc
+       and set ZSH_THEME="powerlevel10k/powerlevel10k"
+       close terminal then open again
+       (NOTE: you recomended to install all fonts too, in this git : 
+       https://github.com/romkatv/powerlevel10k/blob/master/font.md
+       and copy to /usr/share/fonts/MesloLGS, dont forget to cache your font with sudo fc-cache -f -v)
+
+    9. Install Intel's Microcode
+       sudo xbps-install -Rs intel-ucode 
+       Reconfigure your kernel, according your kernel name
+       sudo xbps-reconfigure -f linux<kernel_version>
+       Note: To find your Linux kernel version, you can use
+       sudo xbps-query -l | grep linux
+       
+    10. Install and set pipewire :
+       sudo xbps-install -S pipewire libspa-bluetooth
+       add service pipewire
+       sudo ln -s /etc/sv/pipewire /var/service/
+       add service pipewire-pulse
+       sudo ln -s /etc/sv/pipewire-pulse /var/service/
+       add user group
+       sudo usermod -aG _pipewire,pulse,pulse-access $USER
+       logout your session then login again
+       check your pipewire is activated using pactl
+       pactl info
+       
+    11. Set brightness backlight :
+       sudo mkdir /etc/sv/backlight
+       sudo wget "https://raw.githubusercontent.com/madand/runit-services/master/backlight/run" -P /etc/sv/backlight
+       sudo wget "https://raw.githubusercontent.com/madand/runit-services/master/backlight/finish" -P /etc/sv/backlight
+       add service backligth
+       sudo ln -s /etc/sv/backlight /var/service/
+       add execution backlight
+       sudo chmod +x /etc/sv/backlight/*
+       
+    12. Install dnscrypt-proxy
+       sudo xbps-install -S dnscrypt-proxy
+       add service
+       sudo ln -s /etc/sv/dnscrypt-proxy /var/service/
+       disable automatic and change your network ipv4 to 127.0.0.1
+       
+    13. fix boot hidden multiboot :
+       sudo nano /etc/default/grub
+       add :
+       GRUB_DISABLE_OS_PROBER=false
+       note : if you want to change resoution and without timeout, add this :
+       GRUB_GFXMODE=1366x768x32
+       GRUB_TIMEOUT=-1
+       save, then do
+       sudo update-grub
+       
+    14. add auto mount partition
+       (I want to auto mount 2 partitions with name data1 and data2 inside /mnt directory)
+       sudo mkdir /mnt/data1 && sudo mkdir /mnt/data2 
+       edit your file etc/fstab :
+       sudo nano /etc/fstab :
+	add this script
+       #auto mount data 1 
+       UUID=6D0ECF810E998896 /mnt/data1 ntfs defaults,nls=utf8,umask=000,uid=1000,windows_names 0 0
+       
+       #auto mount data 2
+       UUID=67C9DD62147F519A /mnt/data2 ntfs defaults,nls=utf8,umask=000,uid=1000,windows_names 0 0
+       Save
+       # NOTE : you cant get your UUID with blkid
+       for testing mount :
+       sudo mount -a (for testing)
+       
+    15. Install microsoft fonts, wps-office, google chrome, telegram with void packages github
+       git clone https://github.com/void-linux/void-packages
+       cd void-packages
+       ./xbps-src binary-bootstrap
+       echo "XBPS_ALLOW_RESTRICTED=yes" >> etc/conf
+       
+       install microsoft fonts
+       ./xbps-src pkg -f msttcorefonts
+       xi msttcorefonts
+       
+       install google chrome
+       ./xbps-src pkg -f google-chrome
+       xi google-chrome
+       
+       install wps-office
+       ./xbps-src pkg -f wps-office
+       xi wps-office
+       
+       NOTE : install missing fonts for wps office 
+       git clone https://github.com/IamDH4/ttf-wps-fonts.git
+       cd ttf-wps-fonts
+       sudo bash install.sh
+       
+       install telegram desktop
+       ./xbps-src pkg telegram-desktop
+       xi telegram-desktop
+       
+    16. create bash aliases
+       sudo nano ~/.bash_aliases
+       add this script
+       alias xu='sudo xbps-install xbps && sudo xbps-install -Suv'
+       alias xin='sudo xbps-install'
+       alias xr='sudo xbps-remove -Rcon'
+       alias xl='xbps-query -l'
+       alias xf='xl | grep'
+       alias xs='xbps-query -Rs'
+       alias xd='xbps-query -x'
+       alias clrk='sudo vkpurge rm all && sudo rm -rf /var/cache/xbps/*'
+       alias halt='sudo halt'
+       alias poweroff='sudo poweroff'
+       alias reboot='sudo reboot'
+       alias shutdown='sudo shutdown'
+       
+       sudo nano ~/.zshrc
+       add this line
+       if [ -f ~/.bash_aliases ]; then 
+           . ~/.bash_aliases;
+       fi
+       don’t forget to
+       source ~/.zshrc
+       
+    17. Profile Sync Daemon (PSD)
+       
+       PSD is a service that symlinks & syncs browser profile directories to RAM, thus reducing HDD/SSD calls & speeding up browsers.
+       You can get it from here. This helps Firefox & Chromium reduce ram usage.
+       
+       git clone https://github.com/madand/runit-services
+       cd runit-services
+       sudo mv psd /etc/sv/
+       sudo ln -s /etc/sv/psd /var/service/
+       sudo chmod +x etc/sv/psd/*
+       
+    18. install joplin
+       wget -O - https://raw.githubusercontent.com/laurent22/joplin/dev/Joplin_install_and_update.sh | bash
+       setting your sync, theme, etc
+       
+    19. set font mozilla firefox for better
+       sudo ln -s /usr/share/fontconfig/conf.avail/70-no-bitmaps.conf /etc/fonts/conf.d/
+       sudo xbps-reconfigure -f fontconfig
+       
+    20. setting and sync your vscode or code-oss
+       install font mayukai, you can get or download in github 
+       https://github.com/Iosevka-Mayukai/Iosevka-Mayukai/releases, just download named original zip one
+       and extract to /usr/share/fonts
+       don’t forget to cache 
+       sudo fc-cache -f -v
+       open your vscode or code-oss
+       install setting sync 
+       https://code.visualstudio.com/docs/editor/settings-sync
+       dont forget to activate
+       ( NOTE : this is step for create backup and sync for your
+       https://mikefrobbins.com/2019/03/21/backup-and-synchronize-vscode-settings-with-a-github-gist/ )
+       this is my setting sync 
+       https://gist.github.com/bastomiadi/3de76e278b87334fdf7876789fbd7cc1
+       if you want sync your setting and exstension hit Shift + Alt + D
+       wait your sync until finish
+       
+    21. Install webserver lamp stack
+       sudo xbps-install apache php-apache php-mysql php-intl mariadb phpMyAdmin php-pgsql php-gd php-sqlite php-ldap php-imagick php-xsl 
+       symlink serive apache 
+       sudo ln -s /etc/sv/apache /var/service/apache
+       symlink service mysql 
+       sudo ln -s /etc/sv/mysqld /var/service/mysqld
+       run service apache 
+       sudo sv start apache
+       create symlink directory www inside home directory 
+       sudo ln -s /srv/www/apache ~/www
+       add group apache user
+       sudo usermod -a -G _apache `whoami`
+       add permission
+       sudo chmod -R g+w /srv/www/apache
+       sudo nano /etc/apache/httpd.conf :
+       add comment # mod_mpm_event :
+       #LoadModule mpm_event_module modules/mod_mpm_event.so
+       delete comment # mod_mpm_prefork:
+       LoadModule mpm_prefork_module modules/mod_mpm_prefork.so
+       delete comment # mod_rewrite
+       LoadModule rewrite_module modules/mod_rewrite.so
+       find <Directory "/srv/www/apache">
+       change AllowOverride None to AllowOverride All
+       find <IfModule unixd_module> 
+       add this above <IfModule unixd_module> 
+       LoadModule php7_module /usr/libexec/httpd/modules/libphp7.so
+       AddHandler php7-script .php
+       find <IfModule ssl_module> 
+       after close tag add this to bottom
+       Include /etc/apache/extra/php7_module.conf
+       save and restart service apache 
+       sudo sv restart apache
+       
+    22. activate extension and phpmyadmin
+       sudo nano /etc/php/php.ini
+       remove (;) before ;extension to activate it, like this
+       extension=intl
+       extension=curl
+       extension=intl
+       extension=ldap
+       extension=mysqli
+       extension=pdo_mysql
+       extension=pdo_pgsql
+       extension=pdo_sqlite
+       extension=pgsql
+       
+       NOTE : add this extension too
+       extension=imagick
+       extension=gd
+       
+       now create symlink phpmyadmin inside www 
+       sudo ln -s /usr/share/webapps/phpMyAdmin /srv/www/apache/phpmyadmin
+       
+       dont forget to do : sudo sv restart apache
+       
+       NOTE : you can check your extension with command : php -m in terminal to show your extension is correctly installed
+       
+    23. Create account phpmyadmin
+       open your terminal :
+       sudo mysql -uroot
+       enter your password if needed
+       create user
+       CREATE USER 'newuser'@'localhost' IDENTIFIED BY 'password';
+       NOTE : change newuser and password for your user and your password, then don’t forget to hit enter.
+       Grant all
+       GRANT ALL PRIVILEGES ON * . * TO 'newuser'@'localhost';
+       NOTE : change newuser for your user, then don’t forget to hit enter.
+       Flush Privileges
+       FLUSH PRIVILEGES;
+       don’t forget to hit enter.
+       Type Exit then hit enter to exit your mysql
+       access http://localhost/phpmyadmin then login with your username and your password
+       
+    24. install Power Saving 
+       NOTE : Choose only one laptop mode tools or tlp, dont install booth
+       
+       #laptop-mode tools
+       sudo xbps-install python3-PyQt5 laptop-mode powerstat
+       sudo ln -s /etc/sv/laptop-mode /var/service/
+       
+       #tlp
+       sudo xbps-install tlp tlp-rdw
+       sudo ln -s /etc/sv/tlp /var/service/
+       
+    25. add asteriks (****) when you type your password
+       echo 'Defaults pwfeedback'|sudo tee /etc/sudoers.d/0pwfeedback
+       
+    26. install nvm
+       wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash
+       sudo nano ~/.zshrc
+       add this
+       export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+       save
+       dont forget to
+       source ~/.zshrc
+       then install your nodejs with
+       nvm install --lts
+      
+    27. disable autologin another anon username
+       sudo nano /etc/gdm/custom.conf
+       add # :
+       #AutomaticLoginEnable=true
+       #AutomaticLogin=anon
+       
+    28. enable trim ssd
+       NOTE : check if your  ssd support trim, DISC-MAX (discard maximum bytes) columns are non-zero
+       lsblk --discard
+       sudo nano /etc/fstab
+       add discard after ,
+       /dev/sda1  /  ext4  defaults,discard   0  1
+       
+    29. enable zram
+       install zram : sudo xbps-install zramen
+       make service : sudo ln -s /etc/sv/zramen /var/service
+       edit config : sudo nano /etc/sv/zramen/conf 
+       export ZRAM_COMP_ALGORITHM='lz4'
+       
+    30. fix wifi not working after suspend
+    
+       sudo nano /etc/sv/wifi-service/run
+       add this script :
+       
+       !/bin/sh
+       set -e
+       if [ "$2" = "suspend" ] || [ "$2" = "hybrid-sleep" ]; then
+             case "$1" in
+             pre) true ;;
+             post) sleep 1 && sv restart NetworkManager ;;
+             esac
+       fi
+
+       save, then 
+       sudo chmod +x /etc/sv/wifi-service/* && sudo ln -s /etc/sv/wifi-service /var/service/
+       
+    31. Activate Logging Daemon
+       By default, Void comes with no logging daemon. There are different implementations available, socklog is simplistic          and easy to use:
+
+       sudo xbps-install -Rs socklog-void
+       sudo ln -s /etc/sv/socklog-unix /var/service/
+       sudo ln -s /etc/sv/nanoklogd /var/service/
+
+     
+       My Reference :
+       https://docs.voidlinux.org
+       https://panduan.langitketujuh.id/
+       https://gist.github.com/themagicalmammal/e443d3c5440d566f8206e5b957ab1493
+       
